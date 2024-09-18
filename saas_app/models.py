@@ -23,3 +23,4 @@ class User(Base):
     email: Mapped[str] = mapped_column(unique=True, index=True)
     hashed_password: Mapped[str]
     role: Mapped[Role] = mapped_column(default=Role.basic)
+    top_secret: Mapped[str] = mapped_column(nullable=True)
