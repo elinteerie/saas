@@ -9,15 +9,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from pydantic import BaseModel
 from database import get_db
+
 def authenticate_user(session: Session, username_or_email: str, password: str) -> User | None:
-    try:
-        validate_email(username_or_email)
-        query_filter = User.email
-    except EmailNotValidError:
-        query_filter = User.username
-    user = (session.query(User).filter(query_filter == username_or_email).first())
+    user = get_user(session, username_or_email)
+    print(user)
+
     if not user or not pwd_context.verify(password, user.hashed_password):
-        return user
+        return 
+    return user
     
 
 SECRET_KEY = "a_very_secret_key"
@@ -60,6 +59,7 @@ class Token(BaseModel):
 })
 def get_user_access_token(form_data: OAuth2PasswordRequestForm = Depends(), session: Session = Depends(get_db)):
     user = authenticate_user(session, form_data.username, form_data.password)
+    print(form_data.username)
     if not user: 
         raise HTTPException(
             status_code=401,
