@@ -9,6 +9,8 @@ from operations import add_user
 import security
 import premium_access
 import rbac
+import github_login
+from third_party_login import resolve_github_token
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,6 +21,7 @@ app = FastAPI(title="SAAS Application", lifespan=lifespan)
 app.include_router(security.router)
 app.include_router(premium_access.router)
 app.include_router(rbac.router)
+app.include_router(github_login.router)
 
 @app.post('/register/user', status_code=status.HTTP_201_CREATED, response_model=ResponseCreateUser, responses={
     status.HTTP_409_CONFLICT: {
@@ -36,3 +39,11 @@ def register(user: UserCreateBody, session: Session= Depends(get_db)):
         "user": user_response
     }
 
+
+
+
+@app.get('/home')
+def homepage(user:UserCreateResponse = Depends(resolve_github_token)):
+    return {
+        'message': f" loggedin { user.username}"
+    }

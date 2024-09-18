@@ -1,4 +1,6 @@
 from sqlalchemy.orm import Session
+import os
+from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from models import User
 from email_validator import (validate_email, EmailNotValidError)
@@ -17,9 +19,12 @@ def authenticate_user(session: Session, username_or_email: str, password: str) -
     if not user or not pwd_context.verify(password, user.hashed_password):
         return 
     return user
-    
 
-SECRET_KEY = "a_very_secret_key"
+load_dotenv()  
+
+
+
+SECRET_KEY = os.getenv('SECRET_KEY')
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
